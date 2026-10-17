@@ -12,3 +12,8 @@ export interface RegisterRequest {
 export interface AuthResponse {
   token: string;
 }
+
+export interface CurrentUser {
+  username: string;
+  email?: string;
+}

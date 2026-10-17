@@ -33,3 +33,15 @@
   margin-right: 8px;
   color: rgba(0, 0, 0, 0.54);
 }
+
+@media (max-width: 480px) {
+  .dialog-content {
+    min-width: 0;
+    width: 78vw;
+  }
+
+  .field-row {
+    flex-direction: column;
+    gap: 0;
+  }
+}

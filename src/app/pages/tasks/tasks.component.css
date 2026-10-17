@@ -2,10 +2,12 @@
   background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
   color: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  gap: 8px;
 }
 
 .header-icon {
   margin-right: 8px;
+  flex-shrink: 0;
 }
 
 .header-title {
@@ -13,10 +15,67 @@
   font-weight: 600;
   font-size: 1.25rem;
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .spacer {
   flex: 1 1 auto;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  max-width: 180px;
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.user-chip mat-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.user-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.logout-btn mat-icon {
+  color: #fff;
+}
+
+@media (max-width: 599px) {
+  .header-title {
+    display: none;
+  }
+
+  .user-chip {
+    max-width: 120px;
+    padding: 3px 8px;
+    font-size: 0.78rem;
+  }
+
+  .hola-text {
+    display: none;
+  }
 }
 
 .tasks-page {
@@ -29,7 +88,16 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 14px;
+}
+
+@media (max-width: 480px) {
+  .new-task-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .header-text {

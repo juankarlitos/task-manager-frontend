@@ -10,6 +10,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   Task,
   TASK_PRIORITY_ICONS,
@@ -39,6 +40,7 @@ const MONTHS_ES = [
     MatCardModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatTooltipModule,
   ],
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.css',
@@ -49,6 +51,7 @@ export class TasksComponent implements OnInit {
   completedTasks: Task[] = [];
   completedCollapsed = true;
   loading = false;
+  username = this.authService.getUsername();
 
   priorityLabels = TASK_PRIORITY_LABELS;
   statusLabels = TASK_STATUS_LABELS;

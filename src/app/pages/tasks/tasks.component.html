@@ -2,7 +2,19 @@
   <mat-icon class="header-icon">checklist</mat-icon>
   <span class="header-title">Task Manager</span>
   <span class="spacer"></span>
-  <button mat-icon-button (click)="logout()" aria-label="Cerrar sesión" title="Cerrar sesión">
+  @if (username) {
+    <span class="user-chip">
+      <mat-icon>person</mat-icon>
+      <span class="user-name"><span class="hola-text">Hola, </span>{{ username }}</span>
+    </span>
+  }
+  <button
+    mat-icon-button
+    class="logout-btn"
+    (click)="logout()"
+    aria-label="Cerrar sesión"
+    matTooltip="Cerrar sesión"
+  >
     <mat-icon>logout</mat-icon>
   </button>
 </mat-toolbar>
