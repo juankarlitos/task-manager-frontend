@@ -47,25 +47,57 @@
       </mat-form-field>
     </div>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Recordatorio (opcional)</mat-label>
-      <input matInput type="datetime-local" formControlName="dueDate" />
-      <mat-icon matPrefix class="field-prefix-icon">alarm</mat-icon>
-      @if (form.controls.dueDate.value) {
-        <button
-          mat-icon-button
-          matSuffix
-          type="button"
-          (click)="clearDueDate()"
-          aria-label="Quitar recordatorio"
+    <div class="section-label">
+      <mat-icon class="field-prefix-icon">alarm</mat-icon>
+      Recordatorio (opcional)
+    </div>
+
+    <div class="field-row due-row">
+      <mat-form-field appearance="outline" class="due-date-field">
+        <mat-label>Fecha</mat-label>
+        <input
+          matInput
+          [matDatepicker]="picker"
+          [min]="minSelectableDate"
+          formControlName="dueDateDate"
+          readonly
+          placeholder="dd/mm/aaaa"
+          (click)="picker.open()"
+          (dateChange)="onDateChange($event)"
+        />
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker [touchUi]="touchUi"></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="due-time-field">
+        <mat-label>Hora</mat-label>
+        <mat-select
+          #timeSelect
+          formControlName="dueDateTime"
+          (openedChange)="onTimeSelectOpened($event)"
         >
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-      @if (form.controls.dueDate.hasError('pastDate')) {
-        <mat-error>La fecha debe ser futura</mat-error>
-      }
-    </mat-form-field>
+          @for (time of timeOptions; track time.value) {
+            <mat-option [value]="time.value" [disabled]="time.disabled">{{ time.value }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (form.controls.dueDateDate.value) {
+      <button
+        mat-button
+        type="button"
+        class="clear-due-btn"
+        (click)="clearDueDate()"
+      >
+        <mat-icon>close</mat-icon>
+        Quitar recordatorio
+      </button>
+    }
+
+    @if (form.hasError('pastDate')) {
+      <div class="due-error">La fecha y hora del recordatorio deben ser futuras</div>
+    }
 
     <mat-checkbox formControlName="completed">Completada</mat-checkbox>
   </mat-dialog-content>
