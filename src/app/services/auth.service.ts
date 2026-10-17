@@ -44,6 +44,14 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  validateSession(): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
+    this.fetchCurrentUser().subscribe({ error: () => undefined });
+  }
+
   private fetchCurrentUser(): Observable<CurrentUser> {
     return this.http.get<CurrentUser>(`${environment.apiUrl}/api/auth/me`).pipe(
       tap((user) => this.setUsername(user.username))

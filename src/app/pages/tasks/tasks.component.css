@@ -126,8 +126,17 @@
 
 .loading {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   padding: 40px 0;
+}
+
+.slow-loading-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.55);
+  text-align: center;
 }
 
 .empty-state {
@@ -145,6 +154,14 @@
   height: 40px;
   width: 40px;
   color: rgba(0, 0, 0, 0.25);
+}
+
+.error-state .empty-icon {
+  color: #c62828;
+}
+
+.error-state button {
+  margin-top: 8px;
 }
 
 .task-section {

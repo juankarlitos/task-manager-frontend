@@ -34,7 +34,19 @@
   @if (loading) {
     <div class="loading">
       <mat-spinner diameter="40"></mat-spinner>
+      @if (slowLoading) {
+        <p class="slow-loading-text">Despertando el servidor, puede tardar hasta un minuto...</p>
+      }
     </div>
+  } @else if (loadError) {
+    <mat-card class="empty-state error-state">
+      <mat-icon class="empty-icon">cloud_off</mat-icon>
+      <p>No se pudieron cargar las tareas. Revisa tu conexión e intenta de nuevo.</p>
+      <button mat-raised-button color="primary" (click)="loadTasks()">
+        <mat-icon>refresh</mat-icon>
+        Reintentar
+      </button>
+    </mat-card>
   } @else if (tasks.length === 0) {
     <mat-card class="empty-state">
       <mat-icon class="empty-icon">inbox</mat-icon>

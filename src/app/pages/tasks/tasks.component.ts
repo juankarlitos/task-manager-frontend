@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +28,8 @@ const MONTHS_ES = [
   'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
 ];
 
+const SLOW_LOAD_THRESHOLD_MS = 10000;
+
 @Component({
   selector: 'app-tasks',
   standalone: true,
@@ -45,13 +48,17 @@ const MONTHS_ES = [
   templateUrl: './tasks.component.html',
   styleUrl: './tasks.component.css',
 })
-export class TasksComponent implements OnInit {
+export class TasksComponent implements OnInit, OnDestroy {
   tasks: Task[] = [];
   pendingTasks: Task[] = [];
   completedTasks: Task[] = [];
   completedCollapsed = true;
   loading = false;
+  loadError = false;
+  slowLoading = false;
   username = this.authService.getUsername();
+
+  private slowLoadTimer?: ReturnType<typeof setTimeout>;
 
   priorityLabels = TASK_PRIORITY_LABELS;
   statusLabels = TASK_STATUS_LABELS;
@@ -70,21 +77,48 @@ export class TasksComponent implements OnInit {
     this.loadTasks();
   }
 
+  ngOnDestroy(): void {
+    this.clearSlowLoadTimer();
+  }
+
   loadTasks(): void {
     this.loading = true;
+    this.loadError = false;
+    this.slowLoading = false;
+    this.clearSlowLoadTimer();
+    this.slowLoadTimer = setTimeout(() => {
+      this.slowLoading = true;
+    }, SLOW_LOAD_THRESHOLD_MS);
+
     this.taskService.getTasks().subscribe({
       next: (tasks) => {
+        this.clearSlowLoadTimer();
         this.tasks = tasks;
         this.groupTasks();
         this.loading = false;
+        this.slowLoading = false;
       },
-      error: () => {
+      error: (err: HttpErrorResponse) => {
+        this.clearSlowLoadTimer();
         this.loading = false;
-        this.snackBar.open('No se pudieron cargar las tareas', 'Cerrar', {
-          duration: 4000,
-        });
+        this.slowLoading = false;
+        if (!this.isAuthError(err)) {
+          this.loadError = true;
+        }
       },
     });
+  }
+
+  private clearSlowLoadTimer(): void {
+    if (this.slowLoadTimer) {
+      clearTimeout(this.slowLoadTimer);
+      this.slowLoadTimer = undefined;
+    }
+  }
+
+  private isAuthError(err: unknown): boolean {
+    const status = (err as HttpErrorResponse)?.status;
+    return status === 401 || status === 403;
   }
 
   openCreateDialog(): void {
@@ -117,8 +151,12 @@ export class TasksComponent implements OnInit {
         this.snackBar.open('Tarea creada', 'Cerrar', { duration: 2500 });
         this.loadTasks();
       },
-      error: (err) =>
-        this.snackBar.open(this.getErrorMessage(err), 'Cerrar', { duration: 5000 }),
+      error: (err) => {
+        if (this.isAuthError(err)) {
+          return;
+        }
+        this.snackBar.open(this.getErrorMessage(err), 'Cerrar', { duration: 5000 });
+      },
     });
   }
 
@@ -128,8 +166,12 @@ export class TasksComponent implements OnInit {
         this.snackBar.open('Tarea actualizada', 'Cerrar', { duration: 2500 });
         this.loadTasks();
       },
-      error: (err) =>
-        this.snackBar.open(this.getErrorMessage(err), 'Cerrar', { duration: 5000 }),
+      error: (err) => {
+        if (this.isAuthError(err)) {
+          return;
+        }
+        this.snackBar.open(this.getErrorMessage(err), 'Cerrar', { duration: 5000 });
+      },
     });
   }
 
@@ -247,8 +289,12 @@ export class TasksComponent implements OnInit {
         this.snackBar.open('Tarea eliminada', 'Cerrar', { duration: 2500 });
         this.loadTasks();
       },
-      error: () =>
-        this.snackBar.open('No se pudo eliminar la tarea', 'Cerrar', { duration: 4000 }),
+      error: (err) => {
+        if (this.isAuthError(err)) {
+          return;
+        }
+        this.snackBar.open('No se pudo eliminar la tarea', 'Cerrar', { duration: 4000 });
+      },
     });
   }
 
