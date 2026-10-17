@@ -1,1 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; background: #f4f5f9; }
+
+mat-card-title, .mat-mdc-card-title {
+  font-family: 'Poppins', 'Roboto', sans-serif !important;
+  font-weight: 600 !important;
+}

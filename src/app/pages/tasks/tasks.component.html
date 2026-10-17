@@ -1,0 +1,108 @@
+<mat-toolbar class="app-header">
+  <mat-icon class="header-icon">checklist</mat-icon>
+  <span class="header-title">Task Manager</span>
+  <span class="spacer"></span>
+  <button mat-icon-button (click)="logout()" aria-label="Cerrar sesión" title="Cerrar sesión">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<div class="tasks-page">
+  <div class="tasks-header">
+    <div class="header-text">
+      <h2>Mis tareas</h2>
+      <span class="task-count">{{ tasks.length }} tarea{{ tasks.length === 1 ? '' : 's' }}</span>
+    </div>
+    <button mat-raised-button color="primary" class="new-task-btn" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      Nueva tarea
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (tasks.length === 0) {
+    <mat-card class="empty-state">
+      <mat-icon class="empty-icon">inbox</mat-icon>
+      <p>No tienes tareas todavía. ¡Crea la primera!</p>
+    </mat-card>
+  } @else {
+    <ng-template #taskCard let-task>
+      <mat-card class="task-card" [ngClass]="cardClasses(task)">
+        <div class="task-card-top">
+          <mat-checkbox
+            [checked]="task.status === 'COMPLETED'"
+            (change)="toggleCompleted(task)"
+          ></mat-checkbox>
+
+          <div class="task-info">
+            <span class="task-title" [class.completed]="task.status === 'COMPLETED'">{{ task.title }}</span>
+            @if (task.description) {
+              <span class="task-description">{{ task.description }}</span>
+            }
+          </div>
+
+          <div class="task-actions">
+            <button mat-icon-button (click)="openEditDialog(task)" aria-label="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteTask(task)" aria-label="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        @if (task.priority || task.status) {
+          <div class="task-tags">
+            @if (task.priority) {
+              <span class="tag priority-tag">
+                <mat-icon>{{ priorityIcon(task) }}</mat-icon>
+                {{ priorityLabel(task) }}
+              </span>
+            }
+            @if (task.status) {
+              <span class="tag status-tag" [class]="'status-' + task.status">
+                <mat-icon>{{ statusIcon(task) }}</mat-icon>
+                {{ statusLabel(task) }}
+              </span>
+            }
+          </div>
+        }
+      </mat-card>
+    </ng-template>
+
+    <section class="task-section">
+      <h3 class="section-title">Pendientes</h3>
+
+      @if (pendingTasks.length === 0) {
+        <p class="section-empty">No tienes tareas pendientes.</p>
+      } @else {
+        <div class="tasks-grid">
+          @for (task of pendingTasks; track task.id) {
+            <ng-container [ngTemplateOutlet]="taskCard" [ngTemplateOutletContext]="{ $implicit: task }"></ng-container>
+          }
+        </div>
+      }
+    </section>
+
+    @if (completedTasks.length > 0) {
+      <section class="task-section">
+        <button class="section-toggle" (click)="toggleCompletedSection()">
+          <mat-icon>{{ completedCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+          <h3 class="section-title">Completadas</h3>
+          <span class="section-count">{{ completedTasks.length }}</span>
+        </button>
+
+        @if (!completedCollapsed) {
+          <div class="tasks-grid">
+            @for (task of completedTasks; track task.id) {
+              <ng-container [ngTemplateOutlet]="taskCard" [ngTemplateOutletContext]="{ $implicit: task }"></ng-container>
+            }
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

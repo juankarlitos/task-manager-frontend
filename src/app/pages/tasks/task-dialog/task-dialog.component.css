@@ -1,0 +1,30 @@
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 340px;
+  padding-top: 8px;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+}
+
+.field-row mat-form-field {
+  flex: 1;
+}
+
+.option-icon {
+  vertical-align: middle;
+  margin-right: 6px;
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
