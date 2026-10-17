@@ -35,6 +35,7 @@ export interface Task {
   completed: boolean;
   priority?: TaskPriority;
   status?: TaskStatus;
+  dueDate?: string;
 }
 
 export const TASK_PRIORITY_ORDER: Record<TaskPriority, number> = {

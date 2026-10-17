@@ -22,6 +22,10 @@ import { TaskService } from '../../services/task.service';
 import { AuthService } from '../../services/auth.service';
 import { TaskDialogComponent, TaskDialogData } from './task-dialog/task-dialog.component';
 
+const MONTHS_ES = [
+  'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic',
+];
+
 @Component({
   selector: 'app-tasks',
   standalone: true,
@@ -110,7 +114,8 @@ export class TasksComponent implements OnInit {
         this.snackBar.open('Tarea creada', 'Cerrar', { duration: 2500 });
         this.loadTasks();
       },
-      error: () => this.snackBar.open('No se pudo crear la tarea', 'Cerrar', { duration: 4000 }),
+      error: (err) =>
+        this.snackBar.open(this.getErrorMessage(err), 'Cerrar', { duration: 5000 }),
     });
   }
 
@@ -120,9 +125,38 @@ export class TasksComponent implements OnInit {
         this.snackBar.open('Tarea actualizada', 'Cerrar', { duration: 2500 });
         this.loadTasks();
       },
-      error: () =>
-        this.snackBar.open('No se pudo actualizar la tarea', 'Cerrar', { duration: 4000 }),
+      error: (err) =>
+        this.snackBar.open(this.getErrorMessage(err), 'Cerrar', { duration: 5000 }),
     });
+  }
+
+  private getErrorMessage(err: unknown): string {
+    const fallback = 'No se pudo guardar la tarea';
+    const body = (err as { error?: unknown })?.error as
+      | { errors?: unknown; error?: unknown }
+      | undefined;
+
+    if (!body) {
+      return fallback;
+    }
+
+    if (typeof body.errors === 'string' && body.errors) {
+      return body.errors;
+    }
+    if (Array.isArray(body.errors) && body.errors.length) {
+      return body.errors.join(', ');
+    }
+    if (body.errors && typeof body.errors === 'object') {
+      const values = Object.values(body.errors).filter((v) => typeof v === 'string');
+      if (values.length) {
+        return values.join(', ');
+      }
+    }
+    if (typeof body.error === 'string' && body.error) {
+      return body.error;
+    }
+
+    return fallback;
   }
 
   toggleCompleted(task: Task): void {
@@ -155,6 +189,22 @@ export class TasksComponent implements OnInit {
 
   statusIcon(task: Task): string {
     return task.status ? this.statusIcons[task.status] : '';
+  }
+
+  formatDueDate(dueDate: string): string {
+    const date = new Date(dueDate);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = MONTHS_ES[date.getMonth()];
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    return `${day} ${month}, ${hours}:${minutes}`;
+  }
+
+  isOverdue(task: Task): boolean {
+    if (!task.dueDate || task.status === 'COMPLETED') {
+      return false;
+    }
+    return new Date(task.dueDate).getTime() < Date.now();
   }
 
   cardClasses(task: Task): string[] {

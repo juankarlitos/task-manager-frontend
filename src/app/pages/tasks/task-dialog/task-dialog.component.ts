@@ -1,6 +1,12 @@
 import { Component, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +26,15 @@ import { MatIconModule } from '@angular/material/icon';
 
 export interface TaskDialogData {
   task?: Task;
+}
+
+function futureDateValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) {
+    return null;
+  }
+
+  const date = new Date(control.value);
+  return date.getTime() > Date.now() ? null : { pastDate: true };
 }
 
 @Component({
@@ -55,6 +70,7 @@ export class TaskDialogComponent {
     priority: [this.data.task?.priority ?? '', Validators.required],
     status: [this.data.task?.status ?? '', Validators.required],
     completed: [this.data.task?.completed ?? false],
+    dueDate: [this.data.task?.dueDate?.slice(0, 16) ?? '', futureDateValidator],
   });
 
   constructor(
@@ -63,14 +79,21 @@ export class TaskDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: TaskDialogData
   ) {}
 
+  clearDueDate(): void {
+    this.form.controls.dueDate.setValue('');
+  }
+
   save(): void {
     if (this.form.invalid) {
       return;
     }
 
+    const raw = this.form.getRawValue();
+
     const result: Task = {
       ...this.data.task,
-      ...this.form.getRawValue(),
+      ...raw,
+      dueDate: raw.dueDate ? this.normalizeDueDate(raw.dueDate) : undefined,
     } as Task;
 
     this.dialogRef.close(result);
@@ -78,5 +101,9 @@ export class TaskDialogComponent {
 
   cancel(): void {
     this.dialogRef.close();
+  }
+
+  private normalizeDueDate(value: string): string {
+    return value.length === 16 ? `${value}:00` : value;
   }
 }

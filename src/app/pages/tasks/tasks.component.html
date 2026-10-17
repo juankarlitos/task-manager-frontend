@@ -54,7 +54,7 @@
           </div>
         </div>
 
-        @if (task.priority || task.status) {
+        @if (task.priority || task.status || task.dueDate) {
           <div class="task-tags">
             @if (task.priority) {
               <span class="tag priority-tag">
@@ -66,6 +66,12 @@
               <span class="tag status-tag" [class]="'status-' + task.status">
                 <mat-icon>{{ statusIcon(task) }}</mat-icon>
                 {{ statusLabel(task) }}
+              </span>
+            }
+            @if (task.dueDate) {
+              <span class="tag due-tag" [class.overdue]="isOverdue(task)">
+                <mat-icon>{{ isOverdue(task) ? 'alarm' : 'schedule' }}</mat-icon>
+                {{ formatDueDate(task.dueDate) }}
               </span>
             }
           </div>
