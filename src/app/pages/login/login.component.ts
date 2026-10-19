@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -26,7 +26,7 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loading = false;
 
   form = this.fb.group({
@@ -40,6 +40,14 @@ export class LoginComponent {
     private router: Router,
     private snackBar: MatSnackBar
   ) {}
+
+  ngOnInit(): void {
+    const message = (history.state as { message?: string } | null)?.message;
+    if (message) {
+      this.snackBar.open(message, 'Cerrar', { duration: 5000 });
+      history.replaceState({}, '');
+    }
+  }
 
   submit(): void {
     if (this.form.invalid) {

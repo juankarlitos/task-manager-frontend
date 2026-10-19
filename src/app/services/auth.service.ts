@@ -2,7 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthResponse, CurrentUser, LoginRequest, RegisterRequest } from '../models/auth.model';
+import {
+  AuthResponse,
+  CurrentUser,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+} from '../models/auth.model';
 
 const TOKEN_KEY = 'auth_token';
 const USERNAME_KEY = 'auth_username';
@@ -25,6 +31,14 @@ export class AuthService {
 
   register(data: RegisterRequest): Observable<unknown> {
     return this.http.post(`${environment.apiUrl}/api/auth/register`, data);
+  }
+
+  forgotPassword(email: string): Observable<unknown> {
+    return this.http.post(`${environment.apiUrl}/api/auth/forgot-password`, { email });
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<unknown> {
+    return this.http.post(`${environment.apiUrl}/api/auth/reset-password`, request);
   }
 
   logout(): void {

@@ -18,6 +18,15 @@
   gap: 8px;
 }
 
+.forgot-link {
+  text-align: right;
+  margin-top: -4px;
+}
+
+.forgot-link a {
+  font-size: 0.85rem;
+}
+
 .submit-btn {
   margin-top: 8px;
   height: 40px;
